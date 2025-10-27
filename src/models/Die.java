@@ -8,6 +8,7 @@ public class Die {
 
     /**
      * Creates a new Die object, with face set to eyes. Used for test purpose
+     *
      * @param eyes value should be between 1 and 6
      */
     public Die(int eyes) {
@@ -17,7 +18,14 @@ public class Die {
     public Die() {
     }
 
+    public int getEyes() {
+        return eyes;
+    }
+
     public void roll() {
+        eyes = random.nextInt(6) + 1;
+
+
         //TODO: implement roll method.
     }
 }

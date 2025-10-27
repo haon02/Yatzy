@@ -8,6 +8,9 @@ public class RaffleCup {
     }
 
     public void throwDice() {
+        for (Die die : dice) {
+            die.roll();
+        }
         //TODO: implement throwDice method.
     }
 
