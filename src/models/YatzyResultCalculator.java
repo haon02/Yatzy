@@ -100,32 +100,42 @@ public class YatzyResultCalculator {
 
     public int fullHouseScore() {
 
-        for (int i : yatzyResult) {
-            if (yatzyResult[i] == yatzyResult[i + 1] && yatzyResult[i] == yatzyResult[i + 2]) {
-                return yatzyResult[i] * 4;
+        int[] counts = new int[7];
+        for (int eye : yatzyResult) {
+            counts[eye]++;
+        }
+        boolean hasThree = false;
+        boolean hasTwo = false;
+        int threeValue = 0;
+        int twoValue = 0;
 
+        for (int i = 1; i <= 6; i++) {
+            if (counts[i] == 3) {
+                hasThree = true;
+                threeValue = i;
+            } else if (counts[i] == 2) {
+                hasTwo = true;
+                twoValue = i;
             }
+        }
+
+        if (hasThree && hasTwo) {
+            return threeValue * 3 + twoValue * 2;
+        }
+        return 0;
+    }
+
+
+    public int chanceScore () {
+            //TODO: implement chanceScore method.
+            return 0;
+        }
+
+        public int yatzyScore () {
+            //TODO: implement yatzyScore method.
             return 0;
         }
     }
 
-    public int chanceScore() {
-        //TODO: implement chanceScore method.
-        return 0;
-    }
 
-    public int yatzyScore() {
-        //TODO: implement yatzyScore method.
-        return 0;
-    }
-
-    public int[] rollTwoDice(RaffleCup Dice) {
-        int[] faces = rollTwoDice();
-        Dice[faces[0] - 1]++;
-        Dice[faces[1] - 1]++;
-        if (faces[0] == faces[1]) {
-            sameNumberOfEyes++;
-        }
-    }
-}
 
