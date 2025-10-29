@@ -2,26 +2,31 @@ package gui;
 
 import javafx.application.Application;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.CheckBox;
-import javafx.scene.layout.GridPane;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
-
-import javax.swing.*;
-import java.awt.*;
+import models.Die;
+import models.RaffleCup;
 
 
 public class YatzyGui extends Application {
+    private final Label[] lblDice = new Label[5];
+    private final CheckBox[] chbHold = new CheckBox[5];
+    private final Label lblAntalKastTilbage = new Label("Kast tilbage: 3");
+    private final Button btnKastTerning = new Button("Kast terningerne");
+    private int kastTilbage = 3;
+
+
     @Override
     public void start(Stage primaryStage) {
-        primaryStage.setTitle("Yatzy");
         GridPane pane = new GridPane();
         this.initContent(pane);
-        Scene scene = new Scene(pane);
+        Scene scene = new Scene(pane, 500, 200);
         primaryStage.setScene(scene);
+        primaryStage.setTitle("Yatzy");
         primaryStage.show();
     }
 
@@ -39,29 +44,53 @@ public class YatzyGui extends Application {
         pane.setHgap(10);
         pane.setVgap(10);
 
-        GridPane dicePane = new GridPane();
-        pane.add(dicePane, 0, 0);
-        dicePane.setGridLinesVisible(false);
-        dicePane.setPadding(new Insets(10));
-        dicePane.setHgap(10);
-        dicePane.setVgap(10);
+        String diceStyle = """
+                -fx-border-color: gray;
+                -fx-border-radius: 8;
+                -fx-background-color: white;
+                -fx-background-radius: 8;
+                -fx-font-size: 22;
+                -fx-alignment: center;
+                -fx-padding: 15 25;
+                -fx-min-width: 50;
+                """;
 
 
-        Label lblThrowsLeft = new Label("Antal kast tilbage: ");
-        pane.add(lblThrowsLeft, 0, 0);
+        for (int i = 0; i < 5; i++) {
+            lblDice[i] = new Label("");
+            lblDice[i].setStyle(diceStyle);
+            pane.add(lblDice[i], i + 1, 0);
+        }
+        for (int i = 0; i < 5; i++) {
+            chbHold[i] = new CheckBox("Hold");
+            pane.add(chbHold[i], i + 1, 1);
+        }
 
-        pane.add(chboxhold1, 0, 1);
-        pane.add(chboxhold2, 1, 1);
-        pane.add(chboxhold3, 2, 1);
-        pane.add(chboxhold4, 3, 1);
-        pane.add(chboxhold5, 4, 1);
-        pane.add(lblThrowsLeft, 5,2);
+        pane.add(lblAntalKastTilbage, 1, 3);
+        pane.add(btnKastTerning, 4, 3, 2, 1);
+        btnKastTerning.setOnAction(event -> throwDiceAction());
 
-
-        Button btnDiceThrow = new Button("Kast terningerne ");
-        pane.add(btnDiceThrow, 6, 0);
 
     }
 
+    private void throwDiceAction() {
+
+        if (kastTilbage <= 0) return;
+        RaffleCup raffleCup = new RaffleCup();
+        Die[] dice = raffleCup.getDice();
+
+        for (int i = 0; i < dice.length; i++) {
+            if (!chbHold[i].isSelected()) {
+                dice[i].roll();
+                lblDice[i].setText(String.valueOf(dice[i].getEyes()));
+            }
+        }
+        kastTilbage--;
+        lblAntalKastTilbage.setText(String.valueOf("Kast tilbage " + kastTilbage));
+
+    }
+
+    VBox test = new VBox(20);
 }
+
 

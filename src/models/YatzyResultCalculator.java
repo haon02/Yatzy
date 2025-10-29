@@ -1,24 +1,21 @@
 package models;
 
-import java.util.Arrays;
-
-/**
- * Used to calculate the score of throws with 5 dice
- */
 public class YatzyResultCalculator {
-    private int[] yatzyResult = new int[5];
+    /**
+     * Used to calculate the score of throws with 5 dice
+     * public class YatzyResultCalculator {
+     * /
+     **/
+    private final Die[] dice;
 
     /**
      *
      * @param dice
      */
     public YatzyResultCalculator(Die[] dice) {
-        for (int i = 0; i < dice.length; i++) {
-            yatzyResult[i] = dice[i].getEyes();
-
-        }
-        Arrays.sort(yatzyResult);
         //TODO: implement YatzyResultCalculator constructor.
+        /**/
+        this.dice = dice;
     }
 
     /**
@@ -27,115 +24,110 @@ public class YatzyResultCalculator {
      * @param eyes eye value to calculate score for. eyes should be between 1 and 6
      * @return the score for specified eye value
      */
-
     public int upperSectionScore(int eyes) {
         int sum = 0;
-        for (int eye : yatzyResult) {
-            if (eye == eyes) {
-                sum += eye;
+        for (Die d : dice) {
+            if (d.getEyes() == eyes) {
+                sum += eyes;
             }
         }
         return sum;
+
+    }
+
+    private int[] countEyes() {
+        int[] counts = new int[7]; // index 1–6 bruges
+        for (Die d : dice) {
+            counts[d.getEyes()]++;
+        }
+        return counts;
     }
 
     public int onePairScore() {
-        for (int i = yatzyResult.length - 1; i > 0; i--) {
-            if (yatzyResult[i] == yatzyResult[i - 1]) {
-                return yatzyResult[i] * 2;
-            }
+        int[] c = countEyes();
+        for (int i = 6; i >= 1; i--) {
+            if (c[i] >= 2) return i * 2;
         }
         return 0;
     }
 
     public int twoPairScore() {
-        int pairSum = 0;
-        int pairFound = 0;
-        for (int i = yatzyResult.length - 1; i > 0; i--) {
-            if (yatzyResult[i] == yatzyResult[i - 1]) {
-                pairSum += yatzyResult[i] * 2;
-                pairFound++;
-                i--;
-            }
-            if (pairFound == 2) {
-                return pairSum;
+        int[] c = countEyes();
+        int pairs = 0;
+        int score = 0;
+        for (int i = 6; i >= 1; i--) {
+            if (c[i] >= 2) {
+                pairs++;
+                score += i * 2;
+                if (pairs == 2) return score;
             }
         }
         return 0;
     }
 
     public int threeOfAKindScore() {
-        for (int i = yatzyResult.length - 1; i >= 2; i--) {
-            if (yatzyResult[i] == yatzyResult[i - 1] && yatzyResult[i] == yatzyResult[i - 2]) {
-                return yatzyResult[i] * 3;
-            }
+        int[] count3 = countEyes();
+        for (int i = 6; i >= 1; i--) {
+            if (count3[i] >= 3) return i * 3;
         }
         return 0;
     }
 
     public int fourOfAKindScore() {
-        for (int i = yatzyResult.length - 1; i >= 3; i--) {
-            if (yatzyResult[i] == yatzyResult[i - 1] && yatzyResult[i] == yatzyResult[i - 2] && yatzyResult[i] == yatzyResult[i - 3]) {
-                return yatzyResult[i] * 4;
-            }
+        int[] count4 = countEyes();
+        for (int i = 6; i >= 1; i--) {
+            if (count4[i] >= 4) return i * 4;
         }
-
         return 0;
     }
 
     public int smallStraightScore() {
-        int[] expected = {1, 2, 3, 4, 5};
-        if (Arrays.equals(yatzyResult, expected)) {
-            return 15;
+        int[] countS = countEyes();
+        for (int i = 1; i <= 5; i++) {
+            if (countS[i] != 1) return 0;
         }
-        return 0;
+        return 15; // fast score
     }
 
     public int largeStraightScore() {
-        int[] expected = {2, 3, 4, 5, 6};
-        if (Arrays.equals(yatzyResult, expected)) {
-            return 20;
+        int[] countL = countEyes();
+        for (int i = 2; i <= 6; i++) {
+            if (countL[i] != 1) return 0;
         }
-        return 0;
+        return 20; // fast score
     }
 
     public int fullHouseScore() {
-
-        int[] counts = new int[7];
-        for (int eye : yatzyResult) {
-            counts[eye]++;
-        }
-        boolean hasThree = false;
-        boolean hasTwo = false;
-        int threeValue = 0;
-        int twoValue = 0;
+        int[] countFull = countEyes();
+        int three = 0, two = 0;
 
         for (int i = 1; i <= 6; i++) {
-            if (counts[i] == 3) {
-                hasThree = true;
-                threeValue = i;
-            } else if (counts[i] == 2) {
-                hasTwo = true;
-                twoValue = i;
+            if (countFull[i] == 3) {
+                three = i * 3;
+            }
+            if (countFull[i] == 2) {
+                two = i * 2;
             }
         }
-
-        if (hasThree && hasTwo) {
-            return threeValue * 3 + twoValue * 2;
-        }
-        return 0;
-    }
-
-
-    public int chanceScore () {
-            //TODO: implement chanceScore method.
-            return 0;
-        }
-
-        public int yatzyScore () {
-            //TODO: implement yatzyScore method.
+        if (three > 0 && two > 0) {
+            return three + two;
+        } else {
             return 0;
         }
     }
 
+    public int chanceScore() {
+        int sum = 0;
+        for (Die d : dice)
+            sum += d.getEyes();
+        return sum;
+    }
 
-
+    public int yatzyScore() {
+        int first = dice[0].getEyes();
+        for (Die d : dice) {
+            if (d.getEyes() != first) return 0;
+        }
+        return 50;
+    }
+}
